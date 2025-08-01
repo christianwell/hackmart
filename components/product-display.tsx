@@ -11,7 +11,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import type { StaticImport } from "next/dist/shared/lib/get-img-props";
-import { useCart } from "@/lib/context/cart";
+// import { useCart } from "@/lib/context/cart";
 
 export function ProductDisplay({
   id,
@@ -26,7 +26,7 @@ export function ProductDisplay({
 	price: number;
 	imgSrc: string | StaticImport | null;
 }) {
-	const { addToCart } = useCart();
+	// const { addToCart } = useCart();
 
 	return (
 		<Card className="w-full max-w-sm">
@@ -58,15 +58,15 @@ export function ProductDisplay({
 			<CardFooter className="p-4 pt-2">
 				<Button
 					className="w-full"
-					onClick={() =>
-						addToCart({
-							id, // make sure this is defined!
-							name,
-							price,
-							quantity: 1,
-							imgSrc: imgSrc || "https://placecats.com/300/225",
-						})
-					}
+					// onClick={() =>
+					// 	addToCart({
+					// 		id, // make sure this is defined!
+					// 		name,
+					// 		price,
+					// 		quantity: 1,
+					// 		imgSrc: imgSrc || "https://placecats.com/300/225",
+					// 	})
+					// }
 				>
 					Add to Cart
 				</Button>

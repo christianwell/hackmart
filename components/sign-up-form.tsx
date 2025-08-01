@@ -55,6 +55,23 @@ export function SignUpForm({
       setIsLoading(false);
     }
   };
+  const handleSlackSignUp = async () => {
+		const supabase = createClient();
+		setIsLoading(true);
+		setError(null);
+
+		try {
+			const { data, error } = await supabase.auth.signInWithOAuth({
+				provider: "slack_oidc",
+			});
+			if (error) throw error;
+			// On success, user is redirected by Supabase
+		} catch (error: unknown) {
+			setError(error instanceof Error ? error.message : "An error occurred");
+			setIsLoading(false);
+		}
+	};
+
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -105,6 +122,14 @@ export function SignUpForm({
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating an account..." : "Sign up"}
               </Button>
+              <Button
+								variant="outline"
+								className="w-full"
+								disabled={isLoading}
+								onClick={handleSlackSignUp}
+							>
+								{isLoading ? "Signing up..." : "Signup With Slack"}
+							</Button>
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
