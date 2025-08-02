@@ -53,7 +53,10 @@ export function LoginForm({
 
 		try {
 			const { error } = await supabase.auth.signInWithOAuth({
-				provider: "slack",
+				provider: "slack_oidc",
+        options: {
+          "redirectTo": "http://localhost:3000/auth/callback"
+        }
 			});
 			if (error) throw error;
 			// On success, user is redirected by Supabase
