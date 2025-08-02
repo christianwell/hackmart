@@ -52,8 +52,11 @@ export function LoginForm({
 		setError(null);
 
 		try {
-			const { data, error } = await supabase.auth.signInWithOAuth({
+			const { error } = await supabase.auth.signInWithOAuth({
 				provider: "slack_oidc",
+        options: {
+          "redirectTo": "{process.env.NEXT_PUBLIC_SITE_URL}/auth/callback"
+        }
 			});
 			router.push("/protected");
 

@@ -63,6 +63,9 @@ export function SignUpForm({
 		try {
 			const { data, error } = await supabase.auth.signInWithOAuth({
 				provider: "slack_oidc",
+        options: {
+          "redirectTo": "{process.env.NEXT_PUBLIC_SITE_URL}/auth/callback"
+        }
 			});
 			if (error) throw error;
 			// On success, user is redirected by Supabase
