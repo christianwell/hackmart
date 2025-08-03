@@ -30,13 +30,13 @@ export default async function ProtectedPage() {
 			</div>
 			<div className="flex flex-col gap-2 items-start">
 				<h2 className="font-bold text-2xl mb-4">Test products</h2>
-      <ProductDisplay
-      id="tesvv;;"
-        name="Awesome Capacitor"
-        description="A top-tier capacitor for serious projects."
-        price={2.49}
-        imgSrc={null}
-      />
+				<ProductDisplay
+					id="tesvv;;"
+					name="Awesome Capacitor"
+					description="A top-tier capacitor for serious projects."
+					price={2.49}
+					imgSrc={null}
+				/>
 			</div>
 			<div>
 				<h2 className="font-bold text-2xl mb-4">Next steps</h2>

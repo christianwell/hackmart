@@ -23,7 +23,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 	const [items, setItems] = useState<CartItem[]>([]);
 
 	useEffect(() => {
-		const stored = typeof window !== "undefined" ? localStorage.getItem("cart") : null;
+		const stored =
+			typeof window !== "undefined" ? localStorage.getItem("cart") : null;
 		if (stored) setItems(JSON.parse(stored));
 	}, []);
 
@@ -38,7 +39,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 			const existing = prev.find((i) => i.id === item.id);
 			if (existing) {
 				return prev.map((i) =>
-					i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
+					i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i,
 				);
 			}
 			return [...prev, item];
@@ -52,7 +53,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 	const clearCart = () => setItems([]);
 
 	return (
-		<CartContext.Provider value={{ items, addToCart, removeFromCart, clearCart }}>
+		<CartContext.Provider
+			value={{ items, addToCart, removeFromCart, clearCart }}
+		>
 			{children}
 		</CartContext.Provider>
 	);

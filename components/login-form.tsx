@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn, getURL } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -54,11 +54,10 @@ export function LoginForm({
 		try {
 			const { error } = await supabase.auth.signInWithOAuth({
 				provider: "slack_oidc",
-        options: {
-          "redirectTo": "${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback"
-        }
+				options: {
+					redirectTo: `${getURL()}/auth/callback`,
+				},
 			});
-			router.push("/protected");
 
 			if (error) throw error;
 			// On success, user is redirected by Supabase
