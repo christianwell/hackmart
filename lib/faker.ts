@@ -16,7 +16,7 @@ export function createProducts(count: number): Product[] {
 			name: faker.commerce.productName(),
 			description: faker.commerce.productDescription(),
 			price: Number.parseFloat(faker.commerce.price()),
-			imgSrc: "https://placecats.com/300/400"
+			imgSrc: "https://placecats.com/300/400",
 		});
 	}
 	return products;

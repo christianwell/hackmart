@@ -61,7 +61,7 @@ export function SignUpForm({
 		setError(null);
 
 		try {
-			const { data, error } = await supabase.auth.signInWithOAuth({
+			const { error } = await supabase.auth.signInWithOAuth({
 				provider: "slack_oidc",
 				options: {
 					redirectTo: `${getURL()}/auth/callback`,

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { ProductDisplay } from "@/components/product-display";
 import { createProducts } from "@/lib/faker";
 

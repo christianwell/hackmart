@@ -1,7 +1,6 @@
 import { AuthButton } from "@/components/auth-button";
 import { CartBadgeWrapper } from "@/components/cart-badge-wrapper";
 import { EnvVarWarning } from "@/components/env-var-warning";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { hasEnvVars } from "@/lib/utils";
 import Link from "next/link";
 

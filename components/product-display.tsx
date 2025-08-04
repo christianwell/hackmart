@@ -20,14 +20,22 @@ export function ProductDisplay({
 	description,
 	price,
 	imgSrc,
+	tags,
 }: {
 	id: string;
 	name: string;
 	description: string;
 	price: number;
 	imgSrc: string | StaticImport | null;
+	tags:
+		| {
+				name: string;
+				color: string;
+		  }[]
+		| null;
 }) {
-	const { addToCart } = useCart();
+	const { addToCart, getItemQuantity, removeFromCart } = useCart();
+	tags = tags ?? [];
 
 	return (
 		<Card className="w-full max-w-sm">
@@ -35,6 +43,11 @@ export function ProductDisplay({
 				<div className="flex items-center justify-between">
 					<CardTitle className="text-lg">{name}</CardTitle>
 					<Badge variant="secondary">New</Badge>
+					{tags.map((tag) => (
+						<Badge variant="secondary" key={tag.name}>
+							{tag.name}
+						</Badge>
+					))}
 				</div>
 				<CardDescription className="text-muted-foreground">
 					{description}
@@ -57,20 +70,45 @@ export function ProductDisplay({
 			</CardContent>
 
 			<CardFooter className="p-4 pt-2">
-				<Button
-					className="w-full"
-					onClick={() =>
-						addToCart({
-							id, // make sure this is defined!
-							name,
-							price,
-							quantity: 1,
-							imgSrc: imgSrc || "https://placecats.com/300/225",
-						})
-					}
-				>
-					Add to Cart
-				</Button>
+				{getItemQuantity(id) > 0 ? (
+					<div className="flex items-center justify-between w-full space-x-2">
+						<Button variant="outline" onClick={() => removeFromCart(id)}>
+							-
+						</Button>
+						<span className="text-sm font-medium">
+							{getItemQuantity(id)} in cart
+						</span>
+						<Button
+							variant="outline"
+							onClick={() =>
+								addToCart({
+									id,
+									name,
+									price,
+									quantity: 1,
+									imgSrc: imgSrc || "https://placecats.com/300/225",
+								})
+							}
+						>
+							+
+						</Button>
+					</div>
+				) : (
+					<Button
+						className="w-full"
+						onClick={() =>
+							addToCart({
+								id,
+								name,
+								price,
+								quantity: 1,
+								imgSrc: imgSrc || "https://placecats.com/300/225",
+							})
+						}
+					>
+						Add to Cart
+					</Button>
+				)}
 			</CardFooter>
 		</Card>
 	);

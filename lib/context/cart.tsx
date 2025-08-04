@@ -2,7 +2,7 @@
 import type { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { createContext, useContext, useEffect, useState } from "react";
 
-type CartItem = {
+export type CartItem = {
 	id: string;
 	name: string;
 	price: number;
@@ -15,6 +15,7 @@ type CartContextType = {
 	addToCart: (item: CartItem) => void;
 	removeFromCart: (id: string) => void;
 	clearCart: () => void;
+	getItemQuantity: (id: string) => number;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -47,14 +48,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 	};
 
 	const removeFromCart = (id: string) => {
-		setItems((prev) => prev.filter((item) => item.id !== id));
+		setItems((prev) => {
+			return prev
+				.map((item) =>
+					item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
+				)
+				.filter((item) => item.quantity > 0);
+		});
 	};
 
 	const clearCart = () => setItems([]);
 
+	const getItemQuantity = (id: string): number => {
+		const item = items.find((i) => i.id === id);
+		return item ? item.quantity : 0;
+	};
+
 	return (
 		<CartContext.Provider
-			value={{ items, addToCart, removeFromCart, clearCart }}
+			value={{ items, addToCart, removeFromCart, clearCart, getItemQuantity }}
 		>
 			{children}
 		</CartContext.Provider>

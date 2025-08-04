@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/context/cart";
+import { Button } from "@/components/ui/button";
 
 export default function CartReviewPage() {
-	const { items, removeFromCart, clearCart } = useCart();
+	const { items, removeFromCart, clearCart, getItemQuantity, addToCart } = useCart();
 
 	const total = items.reduce(
 		(acc, item) => acc + item.price * item.quantity,
@@ -47,13 +48,48 @@ export default function CartReviewPage() {
 								${item.price} × {item.quantity}
 							</p>
 						</div>
-						<button
-							className="text-red-600 hover:underline"
+										{getItemQuantity(item.id) > 0 ? (
+					<div className="flex items-center justify-between w-full space-x-2">
+						<Button
+							variant="outline"
 							onClick={() => removeFromCart(item.id)}
-							type="button"
 						>
-							Remove
-						</button>
+							-
+						</Button>
+						<span className="text-sm font-medium">
+							{getItemQuantity(item.id)} in cart
+						</span>
+						<Button
+							variant="outline"
+							onClick={() =>
+								addToCart({
+									id: item.id,
+									name: item.name,
+									price: item.price,
+									quantity: 1,
+									imgSrc: item.imgSrc || "https://placecats.com/300/225",
+								})
+							}
+						>
+							+
+						</Button>
+					</div>
+				) : (
+					<Button
+						className="w-full"
+						onClick={() =>
+							addToCart({
+								id: item.id,
+								name: item.name,
+								price: item.price,
+								quantity: 1,
+								imgSrc: item.imgSrc || "https://placecats.com/300/225",
+							})
+						}
+					>
+						Add to Cart
+					</Button>
+				)}
 					</li>
 				))}
 			</ul>
@@ -68,12 +104,16 @@ export default function CartReviewPage() {
 					>
 						Clear Cart
 					</button>
-					<button
-						className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-						type="submit"
-					>
-						Checkout
-					</button>
+					<form action="/api/checkout_sessions" method="POST">
+						<input type="hidden" name="cart" value={JSON.stringify(items)} />
+
+						<button
+							className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+							type="submit"
+						>
+							Checkout
+						</button>
+					</form>
 				</div>
 			</div>
 		</div>
