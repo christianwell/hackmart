@@ -27,7 +27,9 @@ export async function POST(req: Request) {
 				currency: "usd",
 				product_data: {
 					name: item.name,
-					images: item.imgSrc ? [item.imgSrc] : [],
+					images: item.imgSrc
+						? [typeof item.imgSrc === "string" ? item.imgSrc : item.imgSrc.src]
+						: [],
 				},
 				unit_amount: Math.round(item.price * 100),
 			},
