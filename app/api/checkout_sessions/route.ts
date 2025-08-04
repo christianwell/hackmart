@@ -28,7 +28,11 @@ export async function POST(req: Request) {
 				product_data: {
 					name: item.name,
 					images: item.imgSrc
-						? [typeof item.imgSrc === "string" ? item.imgSrc : item.imgSrc.src]
+						? [
+								typeof item.imgSrc === "string"
+									? item.imgSrc
+									: (item.imgSrc as { src: string }).src,
+							]
 						: [],
 				},
 				unit_amount: Math.round(item.price * 100),
@@ -37,6 +41,10 @@ export async function POST(req: Request) {
 		}));
 
 		const session = await stripe.checkout.sessions.create({
+			billing_address_collection: "required",
+			shipping_address_collection: {
+				allowed_countries: ["US", "CA","DK","DE","IN"],
+			},
 			line_items: lineItems,
 			mode: "payment",
 			success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,

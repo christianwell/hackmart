@@ -10,7 +10,7 @@ export default function Shop() {
 			<h1 className="text-3xl font-bold mb-8">Shop</h1>
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
 				{products.map((product) => (
-					<ProductDisplay key={product.id} {...product} />
+					<ProductDisplay key={product.id} {...product} tags={[{name:"new", color: "blue"}]}/>
 				))}
 			</div>
 		</main>
