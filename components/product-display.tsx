@@ -70,16 +70,34 @@ export function ProductDisplay({
 			</CardContent>
 
 			<CardFooter className="p-4 pt-2">
-				{getItemQuantity(id) > 0 ? (
-					<div className="flex items-center justify-between w-full space-x-2">
-						<Button variant="outline" onClick={() => removeFromCart(id)}>
-							-
-						</Button>
-						<span className="text-sm font-medium">
-							{getItemQuantity(id)} in cart
-						</span>
+				<div className="w-full h-10 flex items-center justify-center">
+					{getItemQuantity(id) > 0 ? (
+						<div className="flex items-center justify-between w-full space-x-2 h-full">
+							<Button variant="outline" onClick={() => removeFromCart(id)} className="h-full">
+								-
+							</Button>
+							<span className="text-sm font-medium">
+								{getItemQuantity(id)} in cart
+							</span>
+							<Button
+								variant="outline"
+								onClick={() =>
+									addToCart({
+										id,
+										name,
+										price,
+										quantity: 1,
+										imgSrc: imgSrc || "https://placecats.com/300/225",
+									})
+								}
+								className="h-full"
+							>
+								+
+							</Button>
+						</div>
+					) : (
 						<Button
-							variant="outline"
+							className="w-full h-full"
 							onClick={() =>
 								addToCart({
 									id,
@@ -90,25 +108,10 @@ export function ProductDisplay({
 								})
 							}
 						>
-							+
+							Add to Cart
 						</Button>
-					</div>
-				) : (
-					<Button
-						className="w-full"
-						onClick={() =>
-							addToCart({
-								id,
-								name,
-								price,
-								quantity: 1,
-								imgSrc: imgSrc || "https://placecats.com/300/225",
-							})
-						}
-					>
-						Add to Cart
-					</Button>
-				)}
+					)}
+				</div>
 			</CardFooter>
 		</Card>
 	);

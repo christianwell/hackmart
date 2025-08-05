@@ -40,13 +40,13 @@ export function SignUpForm({
 		}
 
 		try {
-			const { error } = await supabase.auth.signUp({
-				email,
-				password,
-				options: {
-					emailRedirectTo: `${getURL()}/protected`,
-				},
-			});
+			// const { error } = await supabase.auth.signUp({
+			// 	email,
+			// 	password,
+			// 	options: {
+			// 		emailRedirectTo: `${getURL()}/protected`,
+			// 	},
+			// });
 			if (error) throw error;
 			router.push("/auth/sign-up-success");
 		} catch (error: unknown) {
