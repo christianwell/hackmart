@@ -36,6 +36,7 @@ export default async function ProtectedPage() {
 					description="A top-tier capacitor for serious projects."
 					price={2.49}
 					imgSrc={null}
+					tags={[{"name": "new","color": "red"}]}
 				/>
 			</div>
 			<div>

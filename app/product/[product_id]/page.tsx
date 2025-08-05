@@ -1,10 +1,10 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
+// import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import type { StaticImport } from "next/dist/shared/lib/get-img-props";
+// import type { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { useCart } from "@/lib/context/cart";
 
 export default function ProductPage() {

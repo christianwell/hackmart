@@ -42,6 +42,8 @@ export async function POST(req: Request) {
 
 		const session = await stripe.checkout.sessions.create({
 			billing_address_collection: "required",
+			payment_method_types: ['card'],
+
 			shipping_address_collection: {
 				allowed_countries: ["US", "CA","DK","DE","IN"],
 			},

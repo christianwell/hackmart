@@ -1,118 +1,132 @@
 import { redirect } from "next/navigation";
-
 import { stripe } from "../../lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 
 import type Stripe from "stripe";
 
-interface SuccessSearchParams {
-	session_id: string;
-}
+type SuccessPageProps = {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
-export default async function Success({
-	searchParams,
-}: { searchParams: SuccessSearchParams }) {
-	const { session_id } = searchParams;
-	const supabase = await createClient();
+export default async function SuccessPage({ searchParams }: SuccessPageProps) {
+  // Extract session_id from search params, must be a string
+    const params = searchParams ? await searchParams : undefined;
 
-	if (!session_id) {
-		throw new Error("Please provide a valid session_id (`cs_test_...`)");
-	}
+  const session_id =
+    typeof params?.session_id === "string" ? params.session_id : undefined;
 
-	const session = await stripe.checkout.sessions.retrieve(session_id, {
-		expand: ["line_items.data.price.product", "payment_intent", "shipping"],
-	}) 
+  if (!session_id) {
+    throw new Error("Missing `session_id` in search params.");
+  }
 
-	const {
-		status,
-		amount_total,
-		currency,
-		customer_details,
-		payment_status,
-		payment_intent,
-		line_items,
-		shipping
-	} = session;
+  // Initialize Supabase client
+  const supabase = await createClient();
 
-	if (status === "open") {
-		return redirect("/");
-	}
+  // Retrieve the checkout session from Stripe with expanded details
+  const session = await stripe.checkout.sessions.retrieve(session_id, {
+    expand: ["line_items.data.price.product", "payment_intent", "shipping"],
+  });
 
-	if (status === "complete") {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser();
+  const {
+    status,
+    amount_total,
+    currency,
+    customer_details,
+    payment_status,
+    payment_intent,
+    line_items,
+    // shipping_details,
+  } = session;
 
-		// Helper to convert Stripe Address to a plain JSON object
-		const addressToJson = (address: Stripe.Address | null | undefined) => {
-			if (!address) return null;
-			return JSON.parse(JSON.stringify(address));
-		};
-		
+  // Redirect if session is still open (not completed or expired)
+  if (status === "open") {
+    redirect("/");
+  }
 
+  // Process completed session
+  if (status === "complete") {
+    // Get currently authenticated user from Supabase
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-		const orderData = {
-			customer_id: user?.id || null, // Link to Supabase user if logged in
-			total_amount: amount_total ? amount_total / 100 : 0,
-			currency: currency,
-			payment_status: payment_status,
-			billing_address: addressToJson(customer_details?.address),
-			shipping_address: addressToJson(shipping?.address),
-			payment_method:
-				(payment_intent as Stripe.PaymentIntent)?.payment_method_types?.[0] ||
-				null,
-			status: "completed", // Use "completed" for our internal order status
-		};
+    if (userError) {
+      console.error("Error fetching user:", userError);
+      throw new Error("Failed to fetch authenticated user.");
+    }
 
-		const { data: order, error: orderError } = await supabase
-			.from("orders")
-			.insert(orderData)
-			.select()
-			.single();
+    // Helper to serialize Stripe Address objects into JSON-safe objects
+    const addressToJson = (address: Stripe.Address | null | undefined) => {
+      if (!address) return null;
+      // Use JSON stringify/parse to deeply clone
+      return JSON.parse(JSON.stringify(address));
+    };
 
-		if (orderError) {
-			console.error("Error inserting order:", orderError);
-			// Handle error, maybe redirect to an error page
-			throw new Error("Failed to save order details.");
-		}
+    // Prepare order data for insertion
+    const orderData = {
+      customer_id: user?.id ?? null,
+      total_amount: amount_total ? amount_total / 100 : 0,
+      currency,
+      payment_status,
+      billing_address: addressToJson(customer_details?.address),
+    //   shipping_address: addressToJson(shipping?.address),
+      payment_method:
+        (payment_intent as Stripe.PaymentIntent)?.payment_method_types?.[0] ?? null,
+      status: "completed",
+    };
 
-		if (order && line_items?.data) {
-			const orderItemsData = line_items.data.map((item) => {
-				const product = item.price?.product as Stripe.Product;
-				return {
-					order_id: order.id,
-					product_id: product?.metadata?.supabase_product_id
-						? Number.parseInt(product.metadata.supabase_product_id)
-						: null, // Assuming product_id is in metadata
-					quantity: item.quantity,
-					unit_price: item.price?.unit_amount
-						? item.price.unit_amount / 100
-						: 0,
-					total_price: item.amount_total ? item.amount_total / 100 : 0,
-				};
-			});
+    // Insert order record
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .insert(orderData)
+      .select()
+      .single();
 
-			const { error: orderItemsError } = await supabase
-				.from("order_items")
-				.insert(orderItemsData);
+    if (orderError) {
+      console.error("Error inserting order:", orderError);
+      throw new Error("Failed to save order details.");
+    }
 
-			if (orderItemsError) {
-				console.error("Error inserting order items:", orderItemsError);
-				// Handle error
-				throw new Error("Failed to save order item details.");
-			}
-		}
+    // Insert order items if any
+    if (order && line_items?.data) {
+      const orderItemsData = line_items.data.map((item) => {
+        const product = item.price?.product as Stripe.Product;
+        return {
+          order_id: order.id,
+          product_id: product?.metadata?.supabase_product_id
+            ? Number.parseInt(product.metadata.supabase_product_id)
+            : null,
+          quantity: item.quantity,
+          unit_price: item.price?.unit_amount ? item.price.unit_amount / 100 : 0,
+          total_price: item.amount_total ? item.amount_total / 100 : 0,
+        };
+      });
 
-		const customerEmail = customer_details?.email;
+      const { error: orderItemsError } = await supabase
+        .from("order_items")
+        .insert(orderItemsData);
 
-		return (
-			<section id="success">
-				<p>
-					We appreciate your business! A confirmation email will be sent to{" "}
-					{customerEmail}. If you have any questions, please email{" "}
-				</p>
-				<a href="mailto:orders@example.com">orders@example.com</a>.
-			</section>
-		);
-	}
+      if (orderItemsError) {
+        console.error("Error inserting order items:", orderItemsError);
+        throw new Error("Failed to save order item details.");
+      }
+    }
+
+    const customerEmail = customer_details?.email;
+
+    // Return success JSX section (server component)
+    return (
+      <section id="success">
+        <p>
+          We appreciate your business! A confirmation email will be sent to {customerEmail}. If
+          you have any questions, please email{" "}
+          <a href="mailto:orders@example.com">orders@example.com</a>.
+        </p>
+      </section>
+    );
+  }
+
+  // Return null if status is anything else
+  return null;
 }

@@ -1,15 +1,15 @@
-import { Hero } from "@/components/hero";
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/server";
-import { Navbar } from "@/components/navbar";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+// import { Hero } from "@/components/hero";
+// import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
+// import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
+// import { hasEnvVars } from "@/lib/utils";
+// import { createClient } from "@/alib/supabase/server";
+// import { Navbar } from "@/components/navbar";
+// import { ThemeSwitcher } from "@/components/theme-switcher";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-	const supabase = await createClient();
-	const user = await supabase.auth.getClaims();
+	// const supabase = await createClient();
+	// const user = await supabase.auth.getClaims();
 	// return (
 	// 	<main className="min-h-screen flex flex-col items-center">
 	// 		<div className="flex-1 w-full flex flex-col gap-20 items-center">
