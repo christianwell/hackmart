@@ -94,21 +94,22 @@ export default function CartReviewPage() {
 				))}
 			</ul>
 
-			<div className="flex justify-between items-center border-t pt-4">
-				<span className="text-xl font-bold">Total: ${total.toFixed(2)}</span>
-				<div className="space-x-4">
+			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t pt-6 mt-6">
+				<span className="text-2xl font-bold text-gray-800">
+					Total: ${total.toFixed(2)}
+				</span>
+				<div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
 					<button
 						onClick={clearCart}
-						className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+						className="px-4 py-2 w-full sm:w-auto bg-gray-100 text-gray-800 rounded-md border border-gray-300 hover:bg-gray-200 transition-colors"
 						type="button"
 					>
 						Clear Cart
 					</button>
-					<form action="/api/checkout_sessions" method="POST">
+					<form action="/api/checkout_sessions" method="POST" className="w-full sm:w-auto">
 						<input type="hidden" name="cart" value={JSON.stringify(items)} />
-
 						<button
-							className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+							className="px-4 py-2 w-full sm:w-auto bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
 							type="submit"
 						>
 							Checkout

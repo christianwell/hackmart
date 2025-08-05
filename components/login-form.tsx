@@ -1,6 +1,6 @@
 "use client";
 
-import { cn, getURL } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,7 +55,8 @@ export function LoginForm({
 			const { error } = await supabase.auth.signInWithOAuth({
 				provider: "slack_oidc",
 				options: {
-					redirectTo: `${getURL()}/auth/callback`,
+					redirectTo: "https://hackmart-nine.vercel.app/auth/callback",
+					
 				},
 			});
 

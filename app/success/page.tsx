@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { stripe } from "../../lib/stripe";
+import { stripe } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 
 import type Stripe from "stripe";
