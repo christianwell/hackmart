@@ -14,17 +14,18 @@ export default function ProtectedLayout({
 					{children}
 				</div>
 
-				<footer className="w-full flex items-centerjustify-center border-t mx-auto text-center text-xs gap-8 py-16">
+				<footer className="w-full flex flex-col items-center justify-center border-t mx-auto text-center text-xs gap-4 py-8">
 					<p>
-						Powered by{" "}
+						A (Maybe){" "}
 						<a
-							href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
+							href="https://hackclub.com"
 							target="_blank"
 							className="font-bold hover:underline"
 							rel="noreferrer"
 						>
-							Supabase
-						</a>
+							Hack Club
+						</a>{" "}
+						Project
 					</p>
 					<ThemeSwitcher />
 				</footer>

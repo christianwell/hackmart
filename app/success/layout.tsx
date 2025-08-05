@@ -14,7 +14,7 @@ export default function ShopLayout({
 					{children}
 				</div>
 
-				<footer className="w-full flex flex-col items-center justify-center border-t mx-auto text-center text-xs gap-4 py-8">
+<footer className="w-full flex flex-col items-center justify-center border-t mx-auto text-center text-xs gap-4 py-8">
 					<p>
 						A (Maybe){" "}
 						<a
