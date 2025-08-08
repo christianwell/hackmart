@@ -14,7 +14,7 @@ export default function Page() {
 					<Card>
 						<CardHeader>
 							<CardTitle className="text-2xl">
-								Unfortunately, you can't sign up with password
+								You can&apos;t sign up using a password
 							</CardTitle>
 							<CardDescription>Please use Slack</CardDescription>
 						</CardHeader>
