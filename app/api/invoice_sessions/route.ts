@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 			price_data: {
 				currency: "usd",
 				product_data: {
-					name: item.name ?? "Unknown Product",
+					name: item.name ?? 'Unknown Product',
 					images: item.img_src
 						? [
 								typeof item.img_src === "string"
@@ -42,11 +42,6 @@ export async function POST(req: Request) {
 			quantity: item.quantity,
 		}));
 		const user = await supabase.auth.getUser();
-		// const customer = await stripe.customers.create({
-		// 	email: user.data.user?.email,
-		// 	name: user.data.user?.email,
-
-		// });
 		const customer = await stripe.customers.search({
 			query: `email:\'${user.data.user?.email}\'`,
 		});
@@ -59,27 +54,30 @@ export async function POST(req: Request) {
 			});
 			customerId = newCustomer.id;
 		}
-		const session = await stripe.checkout.sessions.create({
-			billing_address_collection: "required",
-			payment_method_types: ["card","pay_by_bank"],
-			customer: customerId,
-			shipping_address_collection: {
-				allowed_countries: ["US", "CA", "DK", "DE", "IN"],
-			},
-			line_items: lineItems,
-			mode: "payment",
-			success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-			cancel_url: `${origin}/?canceled=true`,
+		for (const item of lineItems) {
+			await stripe.invoiceItems.create({
+				customer: customerId,
+				amount: Math.round((item.price_data.unit_amount ?? 0) * 100), // Use 'amount' in cents
+				currency: item.price_data.currency ?? 'usd',
+				quantity: item.quantity,
+			});
+		}
+		const invoice = await stripe.invoices.create({
+			customer: customer.id,
+			auto_advance: true, // Auto-finalize the invoice
+			collection_method: "send_invoice", // or 'charge_automatically'
+			days_until_due: 30,
 		});
 
-		if (!session.url) {
-			return NextResponse.json(
-				{ error: "Failed to create checkout session" },
-				{ status: 500 },
-			);
+		// Finalize the invoice if not auto-advanced
+		if (invoice.status === "draft" && invoice.id) {
+			await stripe.invoices.finalizeInvoice(invoice.id);
 		}
 
-		return NextResponse.redirect(session.url, 303);
+		// Send the invoice (if using send_invoice)
+		if (invoice.id) {
+			await stripe.invoices.sendInvoice(invoice.id);
+		}
 	} catch (err) {
 		const error = err as { message?: string; statusCode?: number };
 		return NextResponse.json(

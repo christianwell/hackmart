@@ -1,7 +1,7 @@
 {
 	"private": true,
 	"scripts": {
-		"gen:types": "pnpm dlx --package supabase -- supabase gen types typescript --project-id brkfckesmmvlcksecmes --lang typescript > lib/types/supabase.ts",
+		"gen:types": "supabase gen types typescript --project-id brkfckesmmvlcksecmes --lang typescript > lib/types/supabase.ts",
 		"dev": "next dev --turbopack",
 		"build": "next build",
 		"start": "next start",

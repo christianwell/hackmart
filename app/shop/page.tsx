@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { ProductDisplay } from "@/components/product-display";
-import { createProducts } from "@/lib/faker";
+// import { createProducts } from "@/lib/faker";
 import { createClient } from "@/lib/supabase/client";
-import type { Database, Tables } from "@/lib/types/supabase";
+import type { Tables } from "@/lib/types/supabase";
 
 export default function Shop() {
 	// const products = createProducts(12);
@@ -22,7 +22,7 @@ export default function Shop() {
 		}
 
 		fetchProducts();
-	}, [supabase.from]);
+	}, [supabase]);
 
 	return (
 		<main className="p-4">

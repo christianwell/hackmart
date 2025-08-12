@@ -1,21 +1,15 @@
 "use client";
-import type { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { createContext, useContext, useEffect, useState } from "react";
+import type { Tables } from "@/types/supabase"
 
-export type CartItem = {
-	id: string;
-	name: string;
-	price: number;
-	quantity: number;
-	imgSrc?: string | StaticImport;
-};
+export type CartItem = Tables<'products'> & { quantity: number };
 
 type CartContextType = {
 	items: CartItem[];
 	addToCart: (item: CartItem) => void;
-	removeFromCart: (id: string) => void;
+	removeFromCart: (id: number) => void;
 	clearCart: () => void;
-	getItemQuantity: (id: string) => number;
+	getItemQuantity: (id: number) => number;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -47,7 +41,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 		});
 	};
 
-	const removeFromCart = (id: string) => {
+	const removeFromCart = (id: number) => {
 		setItems((prev) => {
 			return prev
 				.map((item) =>
@@ -59,7 +53,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 	const clearCart = () => setItems([]);
 
-	const getItemQuantity = (id: string): number => {
+	const getItemQuantity = (id: number): number => {
 		const item = items.find((i) => i.id === id);
 		return item ? item.quantity : 0;
 	};

@@ -127,6 +127,8 @@ export type Database = {
 					img_src: string | null;
 					manufacturer_sku: string | null;
 					name: string | null;
+					quantity: number | null;
+					stripe_price: string | null;
 					supplier_sku: string | null;
 					unit_price: number | null;
 				};
@@ -137,6 +139,8 @@ export type Database = {
 					img_src?: string | null;
 					manufacturer_sku?: string | null;
 					name?: string | null;
+					quantity?: number | null;
+					stripe_price?: string | null;
 					supplier_sku?: string | null;
 					unit_price?: number | null;
 				};
@@ -147,6 +151,8 @@ export type Database = {
 					img_src?: string | null;
 					manufacturer_sku?: string | null;
 					name?: string | null;
+					quantity?: number | null;
+					stripe_price?: string | null;
 					supplier_sku?: string | null;
 					unit_price?: number | null;
 				};
