@@ -24,23 +24,27 @@ export async function POST(req: Request) {
 		const origin = headersList.get("origin") ?? getURL();
 
 		// Transform cart items to Stripe line items
-		const lineItems = cartItems.map((item: CartItem) => ({
-			price_data: {
-				currency: "usd",
-				product_data: {
-					name: item.name ?? "Unknown Product",
-					images: item.img_src
-						? [
-								typeof item.img_src === "string"
-									? item.img_src
-									: (item.img_src as { src: string }).src,
-							]
-						: [],
-				},
-				unit_amount: Math.round((item.unit_price ?? 0) * 100),
-			},
-			quantity: item.quantity,
-		}));
+		const lineItemsPromises = cartItems.map(async (item: CartItem) => {
+			const { data: product, error } = await supabase
+				.from("products")
+				.select("*")
+				.eq("id", item.id)
+				.single();
+
+			if (error) {
+				throw new Error(
+					`Failed to fetch product with id ${item.id}: ${error.message}`,
+				);
+			}
+
+			return {
+				price: product.stripe_price ? product.stripe_price : "",
+
+				quantity: item.quantity,
+			};
+		});
+
+		const lineItems = await Promise.all(lineItemsPromises);
 		const user = await supabase.auth.getUser();
 		// const customer = await stripe.customers.create({
 		// 	email: user.data.user?.email,
@@ -61,7 +65,7 @@ export async function POST(req: Request) {
 		}
 		const session = await stripe.checkout.sessions.create({
 			billing_address_collection: "required",
-			payment_method_types: ["card","pay_by_bank"],
+			payment_method_types: ["card", 'us_bank_account'],
 			customer: customerId,
 			shipping_address_collection: {
 				allowed_countries: ["US", "CA", "DK", "DE", "IN"],

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 
 import { stripe } from "../../../lib/stripe";
-import { getURL } from "@/lib/utils";
+// import { getURL } from "@/lib/utils";
 import type { CartItem } from "@/lib/context/cart";
 import { createClient } from "@/lib/supabase/server";
 
@@ -20,33 +20,39 @@ export async function POST(req: Request) {
 
 		const cartItems: CartItem[] = JSON.parse(rawCart);
 
-		const headersList = await headers();
-		const origin = headersList.get("origin") ?? getURL();
+		// const headersList = await headers();
+		// const origin = headersList.get("origin") ?? getURL();
 
 		// Transform cart items to Stripe line items
-		const lineItems = cartItems.map((item: CartItem) => ({
-			price_data: {
-				currency: "usd",
-				product_data: {
-					name: item.name ?? 'Unknown Product',
-					images: item.img_src
-						? [
-								typeof item.img_src === "string"
-									? item.img_src
-									: (item.img_src as { src: string }).src,
-							]
-						: [],
+		const lineItemsPromises = cartItems.map(async (item: CartItem) => {
+			const { data: product, error } = await supabase
+				.from("products")
+				.select("*")
+				.eq("id", item.id)
+				.single();
+
+			if (error) {
+				throw new Error(
+					`Failed to fetch product with id ${item.id}: ${error.message}`,
+				);
+			}
+
+			return {
+				price_data: {
+					price: product.stripe_price ? product.stripe_price : "",
 				},
-				unit_amount: Math.round((item.unit_price ?? 0) * 100),
-			},
-			quantity: item.quantity,
-		}));
-		const user = await supabase.auth.getUser();
-		const customer = await stripe.customers.search({
-			query: `email:\'${user.data.user?.email}\'`,
+				quantity: item.quantity,
+			};
 		});
 
-		let customerId = customer.data[0]?.id;
+		const lineItems = await Promise.all(lineItemsPromises);
+		const user = await supabase.auth.getUser();
+		const customerSearchResponse = await stripe.customers.search({
+			query: `email:\'${user.data.user?.email}\'`,
+		});
+		
+
+		let customerId = customerSearchResponse.data[0]?.id;
 		if (!customerId) {
 			const newCustomer = await stripe.customers.create({
 				email: user.data.user?.email,
@@ -54,20 +60,28 @@ export async function POST(req: Request) {
 			});
 			customerId = newCustomer.id;
 		}
-		for (const item of lineItems) {
-			await stripe.invoiceItems.create({
-				customer: customerId,
-				amount: Math.round((item.price_data.unit_amount ?? 0) * 100), // Use 'amount' in cents
-				currency: item.price_data.currency ?? 'usd',
-				quantity: item.quantity,
-			});
-		}
+
 		const invoice = await stripe.invoices.create({
-			customer: customer.id,
+			customer: customerId,
 			auto_advance: true, // Auto-finalize the invoice
 			collection_method: "send_invoice", // or 'charge_automatically'
 			days_until_due: 30,
 		});
+		for (const item of lineItems) {
+			console.log(item)
+			for (const item of lineItems) {
+				if (!item.price_data.price) continue; // skip if price is empty
+
+				await stripe.invoiceItems.create({
+					customer: customerId,
+					pricing: {
+						price: item.price_data.price
+					},
+					quantity: item.quantity, // quantity is allowed when using a price ID
+					invoice: invoice.id,
+				});
+			}
+		}
 
 		// Finalize the invoice if not auto-advanced
 		if (invoice.status === "draft" && invoice.id) {
@@ -78,6 +92,7 @@ export async function POST(req: Request) {
 		if (invoice.id) {
 			await stripe.invoices.sendInvoice(invoice.id);
 		}
+		return NextResponse.redirect("/shop")
 	} catch (err) {
 		const error = err as { message?: string; statusCode?: number };
 		return NextResponse.json(

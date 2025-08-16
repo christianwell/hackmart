@@ -112,7 +112,16 @@ export default function CartReviewPage() {
 							className="px-4 py-2 w-full sm:w-auto bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
 							type="submit"
 						>
-							Checkout
+							Checkout with card
+						</button>
+					</form>
+					<form action="/api/invoice_sessions" method="POST" className="w-full sm:w-auto">
+						<input type="hidden" name="cart" value={JSON.stringify(items)} />
+						<button
+							className="px-4 py-2 w-full sm:w-auto bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+							type="submit"
+						>
+							Checkout with invoice
 						</button>
 					</form>
 				</div>
