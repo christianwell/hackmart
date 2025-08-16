@@ -6,10 +6,12 @@ import { useCart } from "@/lib/context/cart";
 import { Button } from "@/components/ui/button";
 
 export default function CartReviewPage() {
-	const { items, removeFromCart, clearCart, getItemQuantity, addToCart } = useCart();
+	const { items, removeFromCart, clearCart, getItemQuantity, addToCart } =
+		useCart();
 
 	const total = items.reduce(
-		(acc, item) => acc + item.price * item.quantity,
+		(acc, item) =>
+			acc + (item.unit_price ? item.unit_price : 0) * item.quantity,
 		0,
 	);
 
@@ -33,10 +35,10 @@ export default function CartReviewPage() {
 						key={item.id}
 						className="flex items-center gap-4 border p-4 rounded-md"
 					>
-						{item.imgSrc && (
+						{item.img_src && (
 							<Image
-								src={item.imgSrc}
-								alt={item.name}
+								src={item.img_src}
+								alt={item.name? item.name : "unknown"}
 								width={80}
 								height={80}
 								className="rounded-md"
@@ -45,51 +47,51 @@ export default function CartReviewPage() {
 						<div className="flex-1">
 							<h2 className="text-lg font-semibold">{item.name}</h2>
 							<p>
-								${item.price} × {item.quantity}
+								${item.unit_price} × {item.quantity}
 							</p>
 						</div>
-										{getItemQuantity(item.id) > 0 ? (
-					<div className="flex items-center justify-between w-full space-x-2">
-						<Button
-							variant="outline"
-							onClick={() => removeFromCart(item.id)}
-						>
-							-
-						</Button>
-						<span className="text-sm font-medium">
-							{getItemQuantity(item.id)} in cart
-						</span>
-						<Button
-							variant="outline"
-							onClick={() =>
-								addToCart({
-									id: item.id,
-									name: item.name,
-									price: item.price,
-									quantity: 1,
-									imgSrc: item.imgSrc || "https://placecats.com/300/225",
-								})
-							}
-						>
-							+
-						</Button>
-					</div>
-				) : (
-					<Button
-						className="w-full"
-						onClick={() =>
-							addToCart({
-								id: item.id,
-								name: item.name,
-								price: item.price,
-								quantity: 1,
-								imgSrc: item.imgSrc || "https://placecats.com/300/225",
-							})
-						}
-					>
-						Add to Cart
-					</Button>
-				)}
+						{getItemQuantity(item.id) > 0 ? (
+							<div className="flex items-center justify-between w-full space-x-2">
+								<Button
+									variant="outline"
+									onClick={() => removeFromCart(item.id)}
+								>
+									-
+								</Button>
+								<span className="text-sm font-medium">
+									{getItemQuantity(item.id)} in cart
+								</span>
+								<Button
+									variant="outline"
+									onClick={() =>
+										addToCart({
+											id: item.id,
+											name: item.name,
+											unit_price: item.unit_price,
+											quantity: 1,
+											img_src: item.img_src || "https://placecats.com/300/225",
+										})
+									}
+								>
+									+
+								</Button>
+							</div>
+						) : (
+							<Button
+								className="w-full"
+								onClick={() =>
+									addToCart({
+										id: item.id,
+										name: item.name,
+										unit_price: item.unit_price,
+										quantity: 1,
+										img_src: item.img_src || "https://placecats.com/300/225",
+									})
+								}
+							>
+								Add to Cart
+							</Button>
+						)}
 					</li>
 				))}
 			</ul>
@@ -106,7 +108,11 @@ export default function CartReviewPage() {
 					>
 						Clear Cart
 					</button>
-					<form action="/api/checkout_sessions" method="POST" className="w-full sm:w-auto">
+					<form
+						action="/api/checkout_sessions"
+						method="POST"
+						className="w-full sm:w-auto"
+					>
 						<input type="hidden" name="cart" value={JSON.stringify(items)} />
 						<button
 							className="px-4 py-2 w-full sm:w-auto bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -115,7 +121,11 @@ export default function CartReviewPage() {
 							Checkout with card
 						</button>
 					</form>
-					<form action="/api/invoice_sessions" method="POST" className="w-full sm:w-auto">
+					<form
+						action="/api/invoice_sessions"
+						method="POST"
+						className="w-full sm:w-auto"
+					>
 						<input type="hidden" name="cart" value={JSON.stringify(items)} />
 						<button
 							className="px-4 py-2 w-full sm:w-auto bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"

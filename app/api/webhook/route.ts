@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+// import { createClient } from "@/lib/supabase/server";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import type Stripe from "stripe";
@@ -10,7 +10,7 @@ export const config = {
 };
 
 export async function POST(req: Request) {
-	const supabase = await createClient();
+	// const supabase = await createClient();
 	const hea = await headers();
 	const sig = hea.get("stripe-signature");
 
@@ -21,11 +21,15 @@ export async function POST(req: Request) {
 		event = stripe.webhooks.constructEvent(
 			rawBody,
 			sig ? sig : "",
-			(process.env.STRIPE_WEBHOOK_SECRET? process.env.STRIPE_WEBHOOK_SECRET: ""),
+			process.env.STRIPE_WEBHOOK_SECRET
+				? process.env.STRIPE_WEBHOOK_SECRET
+				: "",
 		);
 	} catch (err) {
-		console.error("⚠️ Webhook signature verification failed:", err.message);
-		return new Response("Webhook Error", { status: 400 });
+		const error = err as { message?: string; statusCode?: number };
+
+		console.error("⚠️ Webhook signature verification failed:", error.message);
+		return new Response("Webhook Error", { status: error.statusCode });
 	}
 
 	// Handle the event

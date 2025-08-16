@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
+// import { headers } from "next/headers";
 
 import { stripe } from "../../../lib/stripe";
 // import { getURL } from "@/lib/utils";

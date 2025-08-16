@@ -2,6 +2,8 @@ import { CartProvider } from "@/lib/context/cart";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const defaultUrl = process.env.NEXT_PUBLIC_SITE_URL
@@ -36,6 +38,8 @@ export default function RootLayout({
 						disableTransitionOnChange
 					>
 						{children}
+						<SpeedInsights />
+						<Analytics />
 					</ThemeProvider>
 				</CartProvider>
 			</body>

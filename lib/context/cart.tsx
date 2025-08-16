@@ -1,8 +1,14 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import type { Tables } from "@/types/supabase"
+import type { Tables } from "@/types/supabase";
 
-export type CartItem = Tables<'products'> & { quantity: number };
+export type CartItem = {
+	img_src: string;
+	quantity: number;
+	unit_price: number;
+	id: number;
+	name: string | null;
+};
 
 type CartContextType = {
 	items: CartItem[];
