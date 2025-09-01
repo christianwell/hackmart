@@ -14,7 +14,7 @@ export default function ProductPage() {
 	const name = "Sample Product";
 	const description = "This is a sample product description.";
 	const price = 19.99;
-	const imgSrc = "https://placecats.com/300/225";
+	const img_src = "https://placecats.com/300/225";
 	const tags = [
 		{ name: "Featured", color: "blue" },
 		{ name: "Limited", color: "red" },
@@ -25,7 +25,7 @@ export default function ProductPage() {
 			<div className="flex flex-col md:flex-row w-full h-screen">
 				<div className="md:w-3/5 w-full h-full relative">
 					<Image
-						src={imgSrc}
+						src={img_src}
 						alt={name}
 						fill
 						className="object-cover w-full h-full"
@@ -48,18 +48,18 @@ export default function ProductPage() {
 						<p className="mt-4 text-2xl font-semibold">${price}</p>
 					</div>
 					<div className="mt-6">
-						{getItemQuantity(id) > 0 ? (
+						{getItemQuantity(Number(id)) > 0 ? (
 							<div className="flex items-center justify-between w-full space-x-2">
-								<Button variant="outline" onClick={() => removeFromCart(id)}>
+								<Button variant="outline" onClick={() => removeFromCart(Number(id))}>
 									-
 								</Button>
 								<span className="text-sm font-medium">
-									{getItemQuantity(id)} in cart
+									{getItemQuantity(Number(id))} in cart
 								</span>
 								<Button
 									variant="outline"
 									onClick={() =>
-										addToCart({ id, name, price, quantity: 1, imgSrc })
+										addToCart({ id: Number(id), name, unit_price:price, quantity: 1, img_src: img_src })
 									}
 								>
 									+
@@ -69,7 +69,7 @@ export default function ProductPage() {
 							<Button
 								className="w-full"
 								onClick={() =>
-									addToCart({ id, name, price, quantity: 1, imgSrc })
+									addToCart({ id:Number(id), name, unit_price:price, quantity: 1, img_src: img_src })
 								}
 							>
 								Add to Cart

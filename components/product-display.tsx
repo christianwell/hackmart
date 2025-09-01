@@ -26,7 +26,7 @@ export function ProductDisplay({
 	name: string;
 	description: string;
 	price: number;
-	imgSrc: string | StaticImport | null;
+	imgSrc: string | null;
 	tags:
 		| {
 				name: string;
@@ -71,23 +71,27 @@ export function ProductDisplay({
 
 			<CardFooter className="p-4 pt-2">
 				<div className="w-full h-10 flex items-center justify-center">
-					{getItemQuantity(id) > 0 ? (
+					{getItemQuantity(Number(id)) > 0 ? (
 						<div className="flex items-center justify-between w-full space-x-2 h-full">
-							<Button variant="outline" onClick={() => removeFromCart(id)} className="h-full">
+							<Button
+								variant="outline"
+								onClick={() => removeFromCart(Number(id))}
+								className="h-full"
+							>
 								-
 							</Button>
 							<span className="text-sm font-medium">
-								{getItemQuantity(id)} in cart
+								{getItemQuantity(Number(id))} in cart
 							</span>
 							<Button
 								variant="outline"
 								onClick={() =>
 									addToCart({
-										id,
+										id: Number(id),
 										name,
-										price,
+										unit_price: price,
 										quantity: 1,
-										imgSrc: imgSrc || "https://placecats.com/300/225",
+										img_src: imgSrc || "https://placecats.com/300/225",
 									})
 								}
 								className="h-full"
@@ -100,11 +104,11 @@ export function ProductDisplay({
 							className="w-full h-full"
 							onClick={() =>
 								addToCart({
-									id,
+									id: Number(id),
 									name,
-									price,
+									unit_price: price,
 									quantity: 1,
-									imgSrc: imgSrc || "https://placecats.com/300/225",
+									img_src: imgSrc || "https://placecats.com/300/225",
 								})
 							}
 						>
